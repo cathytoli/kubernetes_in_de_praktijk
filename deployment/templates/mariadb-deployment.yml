@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb
+  labels:
+    app: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - name: mariadb
+        image: mariadb
+        imagePullPolicy: Never
+        env:
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: api-secrets
+              key: db_root_password
+        ports:
+        - containerPort: 3306
+          name: db-container
+        volumeMounts:
+          - name: mariadb-persistent-storage
+            mountPath: /var/lib/mariadb
+      volumes:
+        - name: mariadb-persistent-storage
+          persistentVolumeClaim:
+            claimName: mariadb-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb
+  labels:
+    app: db
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+    name: mariadb
+  selector:
+    app: db
+  type: NodePort
