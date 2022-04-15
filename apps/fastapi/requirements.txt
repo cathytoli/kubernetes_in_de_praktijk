@@ -1,0 +1,7 @@
+fastapi
+SQLAlchemy>=1.4.0
+uWSGI==2.0.17.1
+mysql-connector-python
+cryptography
+mariadb
+uvicorn

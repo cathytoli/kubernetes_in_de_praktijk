@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  labels:
+    app: fastapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi
+  template:
+    metadata:
+      labels:
+        app: fastapi
+    spec:
+      containers:
+        - name: fastapi
+          image: fast-api
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: db_root_password
+              valueFrom:
+                secretKeyRef:
+                  name: api-secrets
+                  key: db_root_password
+            - name: db_name
+              value: users
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fast-service
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: fastapi
+  type: LoadBalancer
