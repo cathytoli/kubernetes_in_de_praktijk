@@ -1,18 +1,18 @@
 from typing import List
+import uvicorn
 
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-# ## for local development
-# from models.database.models import User, Base
-# from models.pydantic import models as pydantic_models
-# from database import SessionMaker, engine
+## uncomment for local development
+from models.database.models import User, Base
+from models.pydantic import models as pydantic_models
+from database import SessionMaker, engine
 
-from app.models.database.models import User, Base
-from app.models.pydantic import models as pydantic_models
-from app.database import SessionMaker, engine
-
-import uvicorn
+## comment for local development
+# from app.models.database.models import User, Base
+# from app.models.pydantic import models as pydantic_models
+# from app.database import SessionMaker, engine
 
 
 app = FastAPI()
