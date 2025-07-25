@@ -7,9 +7,12 @@ import os
 db_root_password = os.environ.get('db_root_password')
 db_name = os.environ.get('db_name')
 
+# db_root_password = 'halloditiseenwachtwoord'
+# db_name = 'users'
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"  # for local development
-# SQLALCHEMY_DATABASE_URL = f"mariadb+mariadbconnector://root:{db_root_password}@mariadb:3306"
+
+# SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+SQLALCHEMY_DATABASE_URL = f"mariadb+mariadbconnector://root:{db_root_password}@mariadb:3306"
 
 
 if 'maria' in SQLALCHEMY_DATABASE_URL:

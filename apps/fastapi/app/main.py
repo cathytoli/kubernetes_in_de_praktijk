@@ -1,18 +1,19 @@
 from typing import List
-import uvicorn
 
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 ## uncomment for local development
-from models.database.models import User, Base
-from models.pydantic import models as pydantic_models
-from database import SessionMaker, engine
+# from models.database.models import User, Base
+# from models.pydantic import models as pydantic_models
+# from database import SessionMaker, engine
 
 ## comment for local development
-# from app.models.database.models import User, Base
-# from app.models.pydantic import models as pydantic_models
-# from app.database import SessionMaker, engine
+from app.models.database.models import User, Base
+from app.models.pydantic import models as pydantic_models
+from app.database import SessionMaker, engine
+
+import uvicorn
 
 
 app = FastAPI()
@@ -32,11 +33,33 @@ def get_db_session():
 def index():
     return {"Hello, world!"}
 
-# TODO: create get and post endpoints to query/post data from/to the database
-#  - /user: get user by id
-#  - /user_by_name: get user by name
-#  - /users: get all users
-#  - /create: create user
+
+@app.get("/user", response_model=List[pydantic_models.User])
+def get_user(id: int, session: Session = Depends(get_db_session)):
+    user = session.query(User).filter(User.id == id).all()
+    if user is None:
+        raise HTTPException(status_code=404, detail=f"No user found with id {id}.")
+    return user
+
+@app.get("/user_by_name", response_model=List[pydantic_models.User])
+def get_user_by_name(name: str, session: Session = Depends(get_db_session)):
+    users = session.query(User).filter(User.name == name).all()
+    if users is None:
+        raise HTTPException(status_code=404, detail=f"No user found with name {name}.")
+    return users
+
+@app.get("/users", response_model=List[pydantic_models.User])
+def get_all_users(session: Session = Depends(get_db_session)):
+    users = session.query(User).all()
+    return users
+
+
+@app.post("/create", response_model=pydantic_models.User)
+def add_user(user: pydantic_models.User, session: Session = Depends(get_db_session)):
+    newUser = User(id=user.id, name=user.name, email=user.email)
+    session.add(newUser)
+    session.commit()
+    return newUser
 
 
 if __name__ == "__main__":
